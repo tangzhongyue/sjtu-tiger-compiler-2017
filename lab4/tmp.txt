@@ -1,0 +1,6 @@
+./testcases/test2.tig:6.2: illegal type cycle
+./testcases/test2.tig:6.38: type mismatch
+./testcases/test2.tig:7.1: undefined type arrtype
+./testcases/test2.tig:7.1: type mismatch
+./testcases/test2.tig:9.1: undefined variable arr1
+

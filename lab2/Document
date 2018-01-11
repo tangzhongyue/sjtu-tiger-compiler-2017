@@ -1,0 +1,32 @@
+1. How you handle comments?
+Enter COMMENT state if a "/*" is read in the state of INITIAL.
+For nested comments, I use a variable called commentLvl to record the current comment level. Every time a "/*" is read, the commentLvl increases by one. Every time a "*/" is read, the commentLvl decreases by one.
+For "\n", go to a new line. 
+For other characters in comment, just ignore.
+
+2. How you handle strings?
+Enter STR state if a "\"" is read. 
+I use a buf with length of 1024 bytes to store the current string, and an int-type variable called bufpos to record the current position to write in the buf. 
+And since a string is actually one token, I only move char postion without changing EM_tokPos when reading a string.
+For allowed escape sequences:
+\n(\\n): write '\n' in the position
+\t(\\t): write '\t' in the position
+\"(\\\"): write '\"' in the position
+\\(\\\\): write '\\' in the position
+\^c(\\\^c): I checked the value each control character stands for, and write the value in the position
+\ddd(\\ddd): change the ddd into integer and write the integer in the position
+\f___f\(\\f+\\): ignore
+For "\"": 
+End of string, write '\0' and assign the string to the yylval.sval. 
+In case of ""(appeared in test16), according to the ref, I assign "(null)" to the yylval.sval. 
+For the rest characters read in STR state, just read and copy it to the buf.
+
+3. Error handling
+In INITIAL state, I treat all input types which are not included in "tokens.h" as illegal. So after the rules of other regular expressions in INITIAL state, I add this rule:
+<INITIAL>. {adjust(); EM_error(EM_tokPos, "illegal character");}
+In STR state and COMMENT state, there are no illegal inputs.
+
+4. End-of-file handling
+I didn't do anything special for the end of file. 
+For new file:
+I use the default INITIAL state for those which are not in the STR and COMMENT state, so I don't have to change state when a new file is opened. 
